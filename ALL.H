@@ -35,5 +35,5 @@
 #include  "cor_adc.h"
 #include  "reg.h"
 #include  "prop_but.h"
-
+#include "md5.h"
 

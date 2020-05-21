@@ -4234,6 +4234,12 @@ union  { float f; unsigned long l; } o,o1;
           goto fin;
         }
 //---------------------------------
+      if (!strcmp(intrpr.wrd,"MD5" ))
+        {   //'MD5'
+          f_md5(0);
+          goto fin;
+        }
+//---------------------------------
        if (!strcmp(intrpr.wrd,"CP" ))
         {   //'CP' Com Protocol
           f_dis_set(ds_cp,2,3);

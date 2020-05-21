@@ -4,7 +4,9 @@
 #define n_mmi_str_2 (n_mmi_str-2)
 #define n_mmi_str_3 (n_mmi_str-3)
 #define n_mmi_str_4 (n_mmi_str-4)
-
+//21.05.2020 YN -----\\//-----
+long int tm_md=0;
+//21.05.2020 YN -----//\\-----
 //
 //  Файл содержит символьные данные в DOS кодировке символов.
 //  Для отображения на дисплее MMI необходимо перекодировать в
@@ -2870,9 +2872,12 @@ m_m8:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
 
-      MmiGotoxy(0,3);   MmiPrintf("   VER %s",sw_ver);
+      MmiGotoxy(0,0);   MmiPrintf("   VER %s",sw_ver);
+      MmiGotoxy(0,2);   MmiPrintf("   MD5 counting ...");
       MmiGotoxy(0,6);   MmiPuts(" ESC   - возврат в меню");
-         sw_mmi=-1;
+         tm_md=TimeStamp;
+         sw_mmi=271;
+         //sw_mmi=-1;
          break;
 
        }
@@ -2986,6 +2991,29 @@ m_m3:
          PassW=0;
        }
        break;
+
+
+ /*========================================*/
+     case 181:
+
+       if((key==ESC)||(key==ENTER))  // переход на начальную страницу
+       {
+         goto m0_f1;
+       }
+       break;
+
+ /*========================================*/
+    case 271:/* ожидание нажатия ESC,Enter */
+         if((key==ESC)||(key==ENTER)  )
+         {
+           goto m0_f1;
+         }
+         if( (f_timer(tm_md,(long int)1000 )) | fl_md_fst )
+         {
+           f_md5(1);
+           sw_mmi=181;
+         }
+         break;
  /*========================================*/
     case 121: // // ввод пароля на изменение данных
        if((key==ESC)||(key==ENTER))    /* переход в меню */
