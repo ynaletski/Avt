@@ -1,5 +1,17 @@
 
+//25.05.2020 YN --\\//--
+//was: #define n_mmi_str 7 // количество строк на дисплее MMI //now:
+#if defined(MMI_ICP)
 #define n_mmi_str 7 // количество строк на дисплее MMI
+int EmptyPage=0;
+#else
+#define n_mmi_str 16 // количество строк на дисплее MMI
+int  ZeroPage=2;
+int  EmptyPage=2;
+#endif
+//25.05.2020 YN --//\\--
+
+
 #define n_mmi_str_1 (n_mmi_str-1)
 #define n_mmi_str_2 (n_mmi_str-2)
 #define n_mmi_str_3 (n_mmi_str-3)
@@ -23,7 +35,6 @@ float vBIG_P=BIG_P;
 float VolT=0;
 float MassT=0;
 
-int EmptyPage=0;
 int i_nn_mvd=0;
 char kran_ch[]="ESC Возврат, 1..4 изм.";
 char kran1[]="ESC Возврат , F1-краны";
@@ -45,10 +56,23 @@ char str_ESC[]="ESC  Возврат";
 char str_verify[]="    Поверка расходомера   )   ";
 //char str_def[]=" ------- ";
 
+//25.05.2020 YN --\\//--
+char str_OOO[]=     "    ООО Факом технолоджиз     ";
+char str_ESC_menu[]="                   ESC - меню ";
+//25.05.2020 YN --//\\--
 
 void f_d_ESC()
 {
-  MmiGotoxy(0,6); MmiPuts(str_ESC);
+//25.05.2020 YN --\\//-- 
+//was:  MmiGotoxy(0,6); MmiPuts(str_ESC); //now:
+#if defined(MMI_ICP)
+         MoveToXY(0,6);
+#endif
+#if defined(MMI_NEW)
+         MoveToXY(0,15);
+#endif
+ MmiPuts(str_ESC);
+ //25.05.2020 YN --//\\--
 }
 void f_prn_comps();
 
@@ -59,6 +83,8 @@ void  f_prn_begin()
   else
   {
     f_clr_scr_MMI();
+  //25.05.2020 --\\//--  
+  #if defined(MMI_ICP) 
             //  MmiPrintf("                              ");
   MmiGotoxy(1,1);  MmiPrintf("  Система учета приема и");
   MmiGotoxy(1,2);  MmiPrintf("отпуска СУГ на автоцистерне");
@@ -81,7 +107,33 @@ void  f_prn_begin()
      MmiGotoxy(0,3) ; MmiPrintf("Масса MVD1  :");
      MmiGotoxy(0,4) ; MmiPrintf("Масса MVD2  :");
      MmiGotoxy(0,5) ; MmiPrintf("Всего       :");
+  #endif
+  #if defined(MMI_NEW) 
+  MmiGotoxy(0,0);  MmiPuts(str_OOO);
+  MmiGotoxy(1,2);  MmiPrintf("  Система учета приема и");
+  MmiGotoxy(1,3);  MmiPrintf("отпуска СУГ на автоцистерне");
+  MmiGotoxy(23,13);  MmiPrintf("9-Откл.");
+  MmiGotoxy(0,15); MmiPuts(str_ESC_menu);
 
+    if(PageD==0)
+    {
+     MmiGotoxy(0,6) ; MmiPrintf("Масса       :");
+     MmiGotoxy(0,8) ; MmiPrintf("Плотность   :");
+     MmiGotoxy(0,10) ; MmiPrintf("Давление    :");
+    }
+    else if(PageD==1)
+    {
+     MmiGotoxy(0,6) ; MmiPrintf("Давление    :");
+     MmiGotoxy(0,8) ; MmiPrintf("Напр.АКБ    :");
+     MmiGotoxy(0,10) ; MmiPrintf("Напр.ИП     :");
+    }
+    else  if(PageD==2)
+    {
+     MmiGotoxy(0,6) ; MmiPrintf("Масса MVD1  :");
+     MmiGotoxy(0,84) ; MmiPrintf("Масса MVD2  :");
+     MmiGotoxy(0,10) ; MmiPrintf("Всего       :");
+  #endif
+  //25.05.2020 --//\\-- 
     }
   }
 }
@@ -158,10 +210,21 @@ int CRC_err=0;
 //-------------------------------------
 void f_prn_CRC_error()
 {
+ //25.05.2020 YN --\\//-- 
+ #if defined(MMI_ICP)
  MmiGotoxy(0,2);   MmiPrintf("!Ошибка контрольной суммы   ");
  MmiGotoxy(0,3);   MmiPrintf("!Параметры потеряны         ");
  MmiGotoxy(0,4);   MmiPrintf("!Необходима перенастройка   ");
  MmiGotoxy(0,5);   MmiPuts(s_empty);
+ #else
+ MmiGotoxy(0,0);  MmiPuts(str_OOO);
+ MmiGotoxy(0,5);   MmiPrintf("!Ошибка контрольной суммы   ");
+ MmiGotoxy(0,7);   MmiPrintf("!Параметры потеряны         ");
+ MmiGotoxy(0,9);   MmiPrintf("!Необходима перенастройка   ");
+ MmiGotoxy(0,11);   MmiPuts(s_empty);
+ MmiGotoxy(0,15);  MmiPuts(str_ESC_menu);
+ #endif
+ //25.05.2020 YN --//\\-- 
  CRC_err=1;
 }
 //-------------------------------------
@@ -172,23 +235,41 @@ void f_prn_proc()
           {
       //      MmiGotoxy(0,4);  MmiPuts(" Плотность     |   Расход      ");
       //      MmiGotoxy(0,5);MmiPrintf("%8.2f кг/м3 | %8.1f кг/ч  ",s_MVD[0].Dens,s_MVD[0].FlowM);
+              //25.05.2020 YN --\\//-- 
+              #if defined(MMI_ICP)
               MmiGotoxy(0,4);  MmiPrintf("Ж:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[0].FlowM,s_MVD[0].Dens,s_MVD[0].Temp);
               MmiGotoxy(0,5);  MmiPrintf("П:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[1].FlowM,s_MVD[1].Dens,s_MVD[1].Temp);
+              #else
+              MmiGotoxy(0,7);  MmiPrintf("Ж:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[0].FlowM,s_MVD[0].Dens,s_MVD[0].Temp);
+              MmiGotoxy(0,9);  MmiPrintf("П:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[1].FlowM,s_MVD[1].Dens,s_MVD[1].Temp);
+              #endif
+              //25.05.2020 YN --//\\-- 
           }
           else if(PageD==1)
           {
 
 //          MmiGotoxy(0,4);    MmiPuts(" P1, МПа | Pнп,МПа |  T,град.C");
 //          MmiGotoxy(0,5);    MmiPrintf("%8.4f |%8.4f |%8.2f   ",s_MVD[0].Press ,s_MVD[0].PressG,s_MVD[0].Temp);
-
+              //25.05.2020 YN --\\//-- 
+              #if defined(MMI_ICP)
            MmiGotoxy(0,4);
                MmiPuts(" P1, МПа | Pнп,МПа |  T,град.C");
            MmiGotoxy(0,5);
              MmiPrintf("%8.4f |%8.4f |%8.2f   ",s_MVD[0].Press,s_MVD[0].PressG,s_MVD[0].Temp);
+              #else
+           MmiGotoxy(0,7);
+               MmiPuts(" P1, МПа | Pнп,МПа |  T,град.C");
+           MmiGotoxy(0,8);
+               MmiPuts("         |         |          ");    
+           MmiGotoxy(0,9);
+             MmiPrintf("%8.4f |%8.4f |%8.2f   ",s_MVD[0].Press,s_MVD[0].PressG,s_MVD[0].Temp);
+              #endif
+              //25.05.2020 YN --//\\--
           }
           else if(PageD==3)
           {
-
+    //25.05.2020 YN --\\//-- 
+    #if defined(MMI_ICP)
      MmiGotoxy(0,4); MmiPuts("Кл.мнш:");
      if( OUT_VAR & OUT2  )
        MmiPuts("1 ");
@@ -200,14 +281,6 @@ void f_prn_proc()
        MmiPuts("1 ");
      else
        MmiPuts("0 ");
-
-/*
-     MmiGotoxy(18,4); MmiPuts("Кл.блш:");
-     if( OUT_VAR & CLP0  )
-       MmiPuts("1 ");
-     else
-       MmiPuts("0 ");
-*/
 
      MmiGotoxy(27,4); MmiPuts("Н:");
      if( OUT_VAR & OUT3  )
@@ -228,30 +301,63 @@ void f_prn_proc()
        MmiPuts("1 ");
      else
        MmiPuts("0 ");
-/*
-     MmiGotoxy(9,5); MmiPuts("Пар вн:");
-     if( OUT_VAR & GAS2  )
+    #else
+     MmiGotoxy(0,7); MmiPuts("Кл.мнш:");
+     if( OUT_VAR & OUT2  )
        MmiPuts("1 ");
      else
        MmiPuts("0 ");
 
-     MmiGotoxy(18,5); MmiPuts("Ждк вн:");
-     if( OUT_VAR & OUT6  )
+     MmiGotoxy( 9,7); MmiPuts("Кл.блш:");
+     if( OUT_VAR & OUT1  )
        MmiPuts("1 ");
      else
        MmiPuts("0 ");
- */
+
+     MmiGotoxy(27,7); MmiPuts("Н:");
+     if( OUT_VAR & OUT3  )
+       MmiPuts("1 ");
+     else
+       MmiPuts("0 ");
+
+     MmiGotoxy(18,7); MmiPuts("Пар АЦ:");
+     if( OUT_VAR & GAS1  )
+       MmiPuts("1 ");
+     else
+       MmiPuts("0 ");
+
+     MmiGotoxy(0,9); MmiPrintf("АКБ=%5.2fV | ИП=%5.2fV",s_MVD[0].Volt_A,s_MVD[0].Volt_DC);
+
+     MmiGotoxy(23,9); MmiPuts("    П:");
+     if( OUT_VAR & OUT8  )
+       MmiPuts("1 ");
+     else
+       MmiPuts("0 ");
+    #endif
+    //25.05.2020 YN --//\\--
           }
 }
 //-------------------------------------
 void f_prn_MassSt_dlv()
 {
+  //25.05.2020 YN --\\//-- 
+  #if defined(MMI_ICP)
   MmiGotoxy(2,1);  MmiPrintf("Всего отпущено %8.2f кг  ",-(s_MVD[0].MassI+s_MVD[1].MassI-MassStamp-MassStamp2));
+  #else
+  MmiGotoxy(2,2);  MmiPrintf("Всего отпущено %8.2f кг  ",-(s_MVD[0].MassI+s_MVD[1].MassI-MassStamp-MassStamp2));
+  #endif
+  //25.05.2020 YN --//\\--
 }
 //-------------------------------------
 void f_prn_MassSt_rcv()
 {
+  //25.05.2020 YN --\\//-- 
+  #if defined(MMI_ICP)
    MmiGotoxy(0,1);
+   #else
+   MmiGotoxy(0,2);
+   #endif
+   //25.05.2020 YN --//\\--
    if(Flag_check == 0)
     MmiPrintf("  Всего принято %8.2f кг  ",s_MVD[0].MassI+s_MVD[1].MassI-MassStamp-MassStamp2);
    else
@@ -268,20 +374,42 @@ void f_prn_error()
 #if( Test == 0)
    if(flag_mvd_ton[0] | flag_mvd_ton[1])
    {
+  //25.05.2020 YN --\\//-- 
+  #if defined(MMI_ICP)
   MmiGotoxy(2,1);  MmiPrintf(" Система учета приема и");
   MmiGotoxy(1,2);  MmiPrintf("отпуска СУГ на автоцистерне");
-
   MmiGotoxy(0,3);  MmiPuts(s_empty);
   MmiGotoxy(0,4);  MmiPrintf(" !Инициализация расходомеров");
   MmiGotoxy(0,5);  MmiPuts(s_empty);
+  #else
+  MmiGotoxy(0,0);   MmiPuts(str_OOO);
+  MmiGotoxy(2,1);  MmiPrintf(" Система учета приема и");
+  MmiGotoxy(1,2);  MmiPrintf("отпуска СУГ на автоцистерне");
+  MmiGotoxy(0,3);  MmiPuts(s_empty);
+  MmiGotoxy(0,4);  MmiPrintf(" !Инициализация расходомеров");
+  MmiGotoxy(0,5);  MmiPuts(s_empty);
+  MmiGotoxy(0,15);  MmiPuts(str_ESC_menu);
+  #endif
+  //25.05.2020 YN --//\\--
    }
    else
 #endif
    {
+   //25.05.2020YN --\\//--
+    #if defined(MMI_ICP)
     MmiGotoxy(0,1);   MmiPrintf("                        ");
     MmiGotoxy(0,2);   MmiPrintf("!Ошибка функционирования ");
     MmiGotoxy(0,3);   MmiPrintf("Sht-F1 отображение ошибок");
     MmiGotoxy(0,4);   MmiPrintf("Sht-ESC очистка ошибок   ");
+    #else
+    MmiGotoxy(0,0);   MmiPuts(str_OOO);
+    MmiGotoxy(0,1);   MmiPrintf("                        ");
+    MmiGotoxy(0,5);   MmiPrintf("!Ошибка функционирования ");
+    MmiGotoxy(0,7);   MmiPrintf("Sht-F1 отображение ошибок");
+    MmiGotoxy(0,9);   MmiPrintf("Sht-ESC очистка ошибок   ");
+    MmiGotoxy(0,15);  MmiPuts(str_ESC_menu);
+    #endif
+    //25.05.2020 YN --//\\--
    }
 }
 //-------------------------------------
@@ -438,8 +566,15 @@ MmiGotoxy(0,i1++); MmiPrintf(" !Нет питания 380V ");
    }
    if(i2==0)
    {
-    MmiGotoxy(5,2); MmiPrintf("Ошибок нет");
-    MmiGotoxy(2,4); MmiPrintf("Enter - продолжить");
+     //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
+    MmiGotoxy(5,2); MmiPrintf("    Ошибок нет");
+    MmiGotoxy(5,4); MmiPrintf("Enter - продолжить");
+#else
+    MmiGotoxy(5,6); MmiPrintf("    Ошибок нет");
+    MmiGotoxy(5,10);MmiPrintf("Enter - продолжить");
+#endif
+    //25.05.2020 YN --//\\--
    }
 }
 //-------------------------------------
@@ -544,14 +679,27 @@ int mode_prn=1;
 void f_prn_current()
 { // показать состояние отпуска на текущий момент
   int year,month,day,hour,min,sec;
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
  MmiGotoxy(0,0);   MmiPrintf("Tекущее значение счетчика СУГ");
  MmiGotoxy(0,3);   MmiPrintf("  Дата     Время     Масса,кг");
 //MmiGotoxy(0,3);  MmiPrintf("21.02.09 12:10:11  _123456.90");
-
  GetDate(&year,&month,&day);GetTime(&hour,&min,&sec);
  MoveToXY(0,5); MmiPrintf("%02d.%02d.%02d %02d:%02d:%02d" ,day,month,year-2000 ,hour,min,sec);
  MmiGotoxy(18,5);  MmiPrintf("%11.3f",s_MVD[0].MassI);
                                    // s_MVD[0].VolI
+#else
+ MmiGotoxy(0,0);  MmiPuts(str_OOO);
+ MmiGotoxy(0,2);   MmiPrintf("Tекущее значение счетчика СУГ");
+ MmiGotoxy(0,4);   MmiPrintf("  Дата     Время     Масса,кг");
+//MmiGotoxy(0,3);  MmiPrintf("21.02.09 12:10:11  _123456.90");
+ GetDate(&year,&month,&day);GetTime(&hour,&min,&sec);
+ MoveToXY(0,6); MmiPrintf("%02d.%02d.%02d %02d:%02d:%02d" ,day,month,year-2000 ,hour,min,sec);
+ MmiGotoxy(18,6);  MmiPrintf("%11.3f",s_MVD[0].MassI);
+                                   // s_MVD[0].VolI
+ MmiGotoxy(0,15);  MmiPuts(str_ESC_menu);
+#endif
+//25.05.2020 YN --//\\--
 }
 //-------------------------------
 //-------------------------------
@@ -561,6 +709,8 @@ float ftmp,ftmp1;
  //  Отображение Массы,плотности,температуры,давления
  //  Текущее значение.
  MmiGotoxy(0,0);   MmiPrintf("Текущие показания расходомера");
+ //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
  MmiGotoxy(0,1);   MmiPrintf(" Масса инв. %10.3f кг",s_MVD[0].MassI);
  MmiGotoxy(0,2);   MmiPrintf(" Масса тек. %10.3f кг",s_MVD[0].MassT);
  MmiGotoxy(0,3);   MmiPrintf(" Расход    %10.2f кг/ч",s_MVD[0].FlowM);
@@ -569,6 +719,15 @@ float ftmp,ftmp1;
 // MmiGotoxy(0,3);   MmiPrintf(" Температура  %6.2f град.C",s_MVD[0].TempR);
  MmiGotoxy(0,5);   MmiPrintf(" Темп.расхдм.  %6.2f град.C",s_MVD[0].Temp);
  MmiGotoxy(0,6);   MmiPuts(" ESC-меню,F1-оч.м.тек.");
+ #else
+ MmiGotoxy(0,2);   MmiPrintf(" Масса инв. %10.3f кг",s_MVD[0].MassI);
+ MmiGotoxy(0,3);   MmiPrintf(" Масса тек. %10.3f кг",s_MVD[0].MassT);
+ MmiGotoxy(0,4);   MmiPrintf(" Расход    %10.2f кг/ч",s_MVD[0].FlowM);
+ MmiGotoxy(0,5);   MmiPrintf(" Плотность %10.2f кг/м3",s_MVD[0].Dens);
+ MmiGotoxy(0,6);   MmiPrintf(" Темп.расхдм.  %6.2f град.C",s_MVD[0].Temp);
+ MmiGotoxy(0,15);   MmiPuts(" ESC-меню,F1-оч.м.тек.");
+ #endif
+ //25.05.2020 YN --//\\--
 }
 //-------------------------------
 
@@ -834,8 +993,13 @@ long int ltmp;
  MmiGotoxy(0,0);   MmiPrintf("  Дата     Время     Масса,кг");
 //MmiGotoxy(0,3);  MmiPrintf("21.02.09 12:10:11  _123456.90");
 
-
+ //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
     for(i=1;i<6;i++,ltime1+=n_sec_day)
+#else
+    for(i=1;i<15;i++,ltime1+=n_sec_day)
+#endif
+//25.05.2020 YN --//\\--
     {
 
 
@@ -855,8 +1019,13 @@ long int ltmp;
      // else
      //    MmiPrintf(" ------- ");
     }
+ //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
     MmiGotoxy(0,6);   MmiPuts("ESC,Enter - продолжить");
-
+#else
+    MmiGotoxy(0,15);   MmiPuts("ESC,Enter - продолжить");
+#endif
+//25.05.2020 YN --//\\--
   }
  }
  else goto m_ok;
@@ -2329,9 +2498,15 @@ long int ltmp;
           SetDisplayPage(EmptyPage);
           sw_mmi=26;
           f_cl_error();
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
           MmiGotoxy(5,2);    MmiPuts("   Ошибки очищены   ");
-          MmiGotoxy(0,4);    MmiPuts(" Enter - продолжить ");
-
+          MmiGotoxy(0,4);    MmiPuts("Enter - продолжить ");
+#else
+          MmiGotoxy(5,6);    MmiPuts("   Ошибки очищены   ");
+         MmiGotoxy(5,10);    MmiPuts("Enter - продолжить ");
+#endif
+//25.05.2020 YN --//\\--
         }
         else if (key==Sht_F1)
         {  // распечатка ошибок
@@ -2380,7 +2555,8 @@ main_menu:
           sw_mmi=120;
           Flag_check = 0;
           PassW=0;
-
+            //25.05.2020 YN --\\//--
+            #if defined(MMI_ICP)
             MmiGotoxy(0,0);    MmiPuts("     Меню ");
             MmiGotoxy(0,1);    MmiPuts("1  Отпуск СУГ");
             MmiGotoxy(0,2);    MmiPuts("2  Прием  СУГ");
@@ -2390,7 +2566,18 @@ main_menu:
             MmiGotoxy(0,5);    MmiPuts("5  Сервисные функции");
 //          MmiGotoxy(0,6);    MmiPuts("6  Плотность,темп.,состав");
             MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
-
+            #else
+            MmiGotoxy(0,0);    MmiPuts("     Меню ");
+            MmiGotoxy(0,2);    MmiPuts("1  Отпуск СУГ");
+            MmiGotoxy(0,3);    MmiPuts("2  Прием  СУГ");
+            MmiGotoxy(0,4);    MmiPuts("3  Операции без учета");
+//          MmiGotoxy(0,3);    MmiPuts("3  Показания счетчика СУГ");
+            MmiGotoxy(0,5);    MmiPuts("4  Просмотр журнала событий");
+            MmiGotoxy(0,6);    MmiPuts("5  Сервисные функции");
+//          MmiGotoxy(0,6);    MmiPuts("6  Плотность,темп.,состав");
+            MmiGotoxy(0,15);    MmiPuts("ESC  Возврат");
+            #endif
+            //25.05.2020 YN --//\\--
           break;
        }
        else if(key==PASS)
@@ -2399,28 +2586,58 @@ main_menu:
          {
           if(PageD==0)
           {
+            //25.05.2020 YN --\\//--
+            #if defined(MMI_ICP)
              MmiGotoxy(14,3);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI+s_MVD[1].MassI);
              MmiGotoxy(14,4);  MmiPrintf("%8.1f  кг/м3 ",s_MVD[0].Dens);
              MmiGotoxy(14,5);  MmiPrintf("%9.3f МПа    ",s_MVD[0].Press);
+            #else
+             MmiGotoxy(14,6);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI+s_MVD[1].MassI);
+             MmiGotoxy(14,8);  MmiPrintf("%8.1f  кг/м3 ",s_MVD[0].Dens);
+             MmiGotoxy(14,10);  MmiPrintf("%9.3f МПа    ",s_MVD[0].Press);
+            #endif
+            //25.05.2020 YN --//\\--
 //           MmiPrintf("%9.2f град.    ",s_MVD[0].Temp);
             // MmiGotoxy(18,4);
             //    f_prn_comps();
           }
           else if(PageD==1)
           {
+            //25.05.2020 YN --\\//--
+            #if defined(MMI_ICP)
              MmiGotoxy(14,3);  MmiPrintf("%9.3f МПа    ",s_MVD[0].Press);
              MmiGotoxy(14,4);  MmiPrintf("%9.2f В       ",s_MVD[0].Volt_A);
              MmiGotoxy(14,5);  MmiPrintf("%9.2f В       ",s_MVD[0].Volt_DC);
+            #else
+             MmiGotoxy(14,6);  MmiPrintf("%9.3f МПа    ",s_MVD[0].Press);
+             MmiGotoxy(14,8);  MmiPrintf("%9.2f В       ",s_MVD[0].Volt_A);
+             MmiGotoxy(14,10);  MmiPrintf("%9.2f В       ",s_MVD[0].Volt_DC);
+            #endif
+            //25.05.2020 YN --//\\--
           }
           else if(PageD==2)
           {
+            //25.05.2020 YN --\\//--
+            #if defined(MMI_ICP)
              MmiGotoxy(14,3);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI);
              MmiGotoxy(14,4);  MmiPrintf("%9.2f кг     ",s_MVD[1].MassI);
              MmiGotoxy(14,5);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI+s_MVD[1].MassI);
+            #else
+             MmiGotoxy(14,6);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI);
+             MmiGotoxy(14,8);  MmiPrintf("%9.2f кг     ",s_MVD[1].MassI);
+             MmiGotoxy(14,10);  MmiPrintf("%9.2f кг     ",s_MVD[0].MassI+s_MVD[1].MassI);
+            #endif
+            //25.05.2020 YN --//\\--
           }
          }
          GetDate(&year,&month,&day);GetTime(&hour,&min,&sec);
+          //25.05.2020 YN --\\//--
+          #if defined(MMI_ICP)
          MoveToXY(0,6);
+         #else
+          MoveToXY(0,13);
+         #endif
+         //25.05.2020 YN --//\\--
          MmiPrintf("%02d.%02d.%02d %02d:%02d:%02d" ,day,month,year-2000 ,hour,min,sec);
         }
 
@@ -2589,15 +2806,31 @@ main_menu:
           {
            pass_ret=0;
 m_pass:
-           MmiGotoxy(1,1);
            f_clr_scr_MMI();
+          //25.05.2020 YN --\\//--
+#if defined(MMI_NEW)
+          SetDisplayPage(EmptyPage); // ввод значения
+#endif
+#if defined(MMI_ICP)
+           MmiGotoxy(1,1);
            MmiPuts("Введите пароль:" );
+#else
+           MmiGotoxy(1,4);
+           MmiPuts("Введите пароль:" );
+#endif
            sprintf( fst_str,"******");
-           SetDisplayPage(17);    // Ввод пароля
+#if defined(MMI_ICP)
+          SetDisplayPage(17);  // Ввод пароля
+#endif
            sw_mmi=121;
            fst_n=7;
            sw_fst=1;
-           MmiGotoxy(11,3);
+#if defined(MMI_ICP)
+          MmiGotoxy(11,3);
+#else
+          MmiGotoxy(11,7);
+#endif
+//25.05.2020 YN --//\\--
 //         MmiGotoxy(15,3);
            break;
           }
@@ -2649,7 +2882,13 @@ m_14_ni:
               MmiGotoxy(0,5);   MmiPuts(" Данные сохранены успешно");
            }
               f_wr_cor();
+              //25.05.2020 YN --\\//--
+              #if defined(MMI_ICP)
               MmiGotoxy(0,6);   MmiPuts("      Enter - продолжить");
+              #else
+              MmiGotoxy(0,15);   MmiPuts("      Enter - продолжить");
+              #endif
+              //25.05.2020 YN --//\\--
          }
          break;
  /*========================================*/
@@ -2677,7 +2916,13 @@ m_14_ni:
            }
 
            f_rd_cor();
-           MmiGotoxy(0,6);   MmiPuts("      Enter - продолжить");
+              //25.05.2020 YN --\\//--
+              #if defined(MMI_ICP)
+              MmiGotoxy(0,6);   MmiPuts("      Enter - продолжить");
+              #else
+              MmiGotoxy(0,15);   MmiPuts("      Enter - продолжить");
+              #endif
+              //25.05.2020 YN --//\\--
          }
          break;
  /*========================================*/
@@ -2740,24 +2985,38 @@ m_m5:
 
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+         //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,0);    MmiPuts("   Меню 1.Отпуск СУГ.");
             f_prn_MassSt_dlv();
             MmiGotoxy(0,2);    MmiPuts("1 Отпуск дозы СУГ");
             MmiGotoxy(0,3);    MmiPuts("2 Отпуск до опорожнения");
           if(flag_prn_mass != 0)
           {  MmiGotoxy(0,4);    MmiPuts("3 Продолжить:");
-
             MmiGotoxy(0,5);
             if(dose_dlvr != vBIG_P)
                 MmiPrintf("Д=%8.2f кг   ",dose_dlvr);
             MmiPrintf("Без дозировки ");
             MmiGotoxy(15,5);   MmiPrintf("О=%8.2f кг   ",-(s_MVD[0].MassT+s_MVD[1].MassT));
           }
-
             MmiGotoxy(0,6);    MmiPuts(kran);
+#else
+            MmiGotoxy(0,0);    MmiPuts("   Меню 1.Отпуск СУГ.");
+            f_prn_MassSt_dlv();
+            MmiGotoxy(0,4);    MmiPuts("1 Отпуск дозы СУГ");
+            MmiGotoxy(0,5);    MmiPuts("2 Отпуск до опорожнения");
+          if(flag_prn_mass != 0)
+          {  MmiGotoxy(0,6);    MmiPuts("3 Продолжить:");
+            MmiGotoxy(0,8);
+            if(dose_dlvr != vBIG_P)
+                MmiPrintf("Д=%8.2f кг   ",dose_dlvr);
+            MmiPrintf("Без дозировки ");
+            MmiGotoxy(15,8);   MmiPrintf("О=%8.2f кг   ",-(s_MVD[0].MassT+s_MVD[1].MassT));
+          }
+            MmiGotoxy(0,15);    MmiPuts(kran);
+#endif
+//25.05.2020 YN --//\\--
          sw_mmi=190;
-
-
          Out_en_pmp = OUT3;  // Насос
       // Out_en_pmp = 0;  // Насос
 
@@ -2783,8 +3042,9 @@ m_m6:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
             MmiGotoxy(0,0);    MmiPuts("   Меню 2.Прием СУГ.");
-
             f_prn_MassSt_rcv();
+         //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,2);    MmiPuts("1 Прием дозы СУГ");
             MmiGotoxy(0,3);    MmiPuts("2 Прием без дозы");
           if(flag_prn_mass != 0)
@@ -2796,9 +3056,22 @@ m_m6:
             MmiPrintf("Без дозировки ");
             MmiGotoxy(15,5);   MmiPrintf("П=%8.2f кг    ",s_MVD[0].MassT+s_MVD[1].MassT);
           }
-
             MmiGotoxy(0,6);    MmiPuts(kran);
+#else
+            MmiGotoxy(0,4);    MmiPuts("1 Прием дозы СУГ");
+            MmiGotoxy(0,5);    MmiPuts("2 Прием без дозы");
+          if(flag_prn_mass != 0)
+          {  MmiGotoxy(0,6);    MmiPuts("3 Продолжить:");
 
+            MmiGotoxy(0,8);
+            if(dose_dlvr != vBIG_P)
+                MmiPrintf("Д=%8.2f кг   ",dose_dlvr);
+            MmiPrintf("Без дозировки ");
+            MmiGotoxy(15,8);   MmiPrintf("П=%8.2f кг    ",s_MVD[0].MassT+s_MVD[1].MassT);
+          }
+            MmiGotoxy(0,15);    MmiPuts(kran);
+#endif
+//25.05.2020 YN --//\\--
 
          Out_en_pmp = OUT3;  // Насос
       // Out_en_pmp = 0;  // Насос
@@ -2818,8 +3091,13 @@ m_m6:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
          MmiGotoxy(0,0); MmiPuts("Прием/Отпуск СУГ без учета");
+         //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
          MmiGotoxy(0,6);    MmiPuts(kran_ch);
-
+#else
+         MmiGotoxy(0,15);    MmiPuts(kran_ch);
+#endif
+//25.05.2020 YN --//\\--
          flag_v2=0;
          OUT_VAR=OUT8 + GAS1 + OUT2 + OUT1 ;
 
@@ -2874,7 +3152,7 @@ m_m8:
 
       MmiGotoxy(0,0);   MmiPrintf("   VER %s",sw_ver);
       MmiGotoxy(0,2);   MmiPrintf("   MD5 counting ...");
-      MmiGotoxy(0,6);   MmiPuts(" ESC   - возврат в меню");
+      f_d_ESC();
          tm_md=TimeStamp;
          sw_mmi=271;
          //sw_mmi=-1;
@@ -2927,6 +3205,10 @@ m_m2:
 
             i= f_get_max_n_arch();
             ar_str_ptr=f_get_fst_stor();
+
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
+
             MmiGotoxy(0,0);    MmiPuts(" Меню 4.Журнал событий.");
             MmiGotoxy(0,1);    MmiPrintf("%4d  ",i);
             j=i%100;
@@ -2965,7 +3247,50 @@ m_m2:
             MmiGotoxy(0,3);    MmiPuts("1  По дате");
             MmiGotoxy(0,4);    MmiPuts("2  По номеру записи");
             MmiGotoxy(0,5);    MmiPuts("3  Последние записи");
-        //    MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
+
+#else
+
+
+            MmiGotoxy(0,0);    MmiPuts(" Меню 4.Журнал событий.");
+            MmiGotoxy(0,2);    MmiPrintf("%4d  ",i);
+            j=i%100;
+            if((j<=20)&& (j>5))
+              MmiPrintf("записей");
+            else
+            switch(i%10)
+            {
+             case 1:
+             MmiPrintf("запись");
+             break;
+
+             case 2:
+             case 3:
+             case 4:
+             MmiPrintf("записи");
+             break;
+
+             case 0:
+             case 5:
+             case 6:
+             case 7:
+             case 8:
+             case 9:
+             MmiPrintf("записей");
+             break;
+            }
+
+   tdat = localtime( &ar_str_ptr->time );
+//   MmiPrintf(" с %02d.%02d.%02d %02d:%02d:%02d",
+//   tdat->tm_mday,tdat->tm_mon+1,tdat->tm_year-100,tdat->tm_hour,tdat->tm_min,tdat->tm_sec);
+   MmiPrintf(" с %02d.%02d.%02d",
+   tdat->tm_mday,tdat->tm_mon+1,tdat->tm_year-100);
+
+            MmiGotoxy(0,4);    MmiPuts(" Просмотр журнала событий");
+            MmiGotoxy(0,6);    MmiPuts("1  По дате");
+            MmiGotoxy(0,8);    MmiPuts("2  По номеру записи");
+            MmiGotoxy(0,10);    MmiPuts("3  Последние записи");
+#endif
+//25.05.2020 YN --//\\--
                         f_d_ESC();
 
          PassW=0;
@@ -2979,11 +3304,21 @@ m_m3:
          f_clr_scr_MMI();
             MmiGotoxy(0,0);    MmiPuts(" Меню 5.Сервисные функции.");
 //            MmiGotoxy(0,1);    MmiPuts("1  Список драйверов");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,1);    MmiPuts("1  Показания счетчика СУГ");
             MmiGotoxy(0,2);    MmiPuts("2  Статистика  драйверов");
             MmiGotoxy(0,3);    MmiPuts("3  Просмотр/ввод параметров");
             MmiGotoxy(0,4);    MmiPuts("4  Другие функции");
             MmiGotoxy(0,5);    MmiPuts("5  Время, дата");
+#else
+            MmiGotoxy(0,2);    MmiPuts("1  Показания счетчика СУГ");
+            MmiGotoxy(0,3);    MmiPuts("2  Статистика  драйверов");
+            MmiGotoxy(0,4);    MmiPuts("3  Просмотр/ввод параметров");
+            MmiGotoxy(0,5);    MmiPuts("4  Другие функции");
+            MmiGotoxy(0,6);    MmiPuts("5  Время, дата");
+#endif
+//25.05.2020 YN --//\\--
           //  MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
                         f_d_ESC();
 
@@ -3250,6 +3585,8 @@ m_m1_2:
 m_m1_3:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+         //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("   Дата состояния счетчика");
            MmiGotoxy(0,1);    MmiPuts("      День.Мес.Год");
         // MmiGotoxy(0,2);    MmiPuts("        08.01.2009");
@@ -3257,6 +3594,16 @@ m_m1_3:
             MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("   Дата состояния счетчика");
+           MmiGotoxy(0,3);    MmiPuts("      День.Мес.Год");
+        // MmiGotoxy(0,2);    MmiPuts("        08.01.2009");
+            MmiGotoxy(0,8);    MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);    MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);    MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\--
       sprintf(fst_str,"%02d.%02d.%04d",(int)adate00.day,(int)adate00.month,(int)(adate00.year+2000) );
           fst_n=11;
           sw_fst=1;
@@ -3277,6 +3624,8 @@ m_m1_5:
       // mmi_str=0;
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+          //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("  Значение расчетного часа");
            MmiGotoxy(0,1);    MmiPuts("       Час.Мин.Сек");
         // MmiGotoxy(0,2);    MmiPuts("        08.00.00");
@@ -3284,6 +3633,16 @@ m_m1_5:
             MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("  Значение расчетного часа");
+           MmiGotoxy(0,3);    MmiPuts("       Час.Мин.Сек");
+        // MmiGotoxy(0,2);    MmiPuts("        08.00.00");
+            MmiGotoxy(0,8);    MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);    MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);    MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\--
       sprintf(fst_str,"%02d.%02d.%02d",(int)ahour00.hour,(int)ahour00.min,(int)ahour00.sec );
           fst_n=9;
           sw_fst=1;
@@ -3412,6 +3771,9 @@ m_m1_5:
 m_m2_1:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("   Дата записи журнала ");
            MmiGotoxy(0,1);    MmiPuts("      День.Мес.Год");
         // MmiGotoxy(0,2);    MmiPuts("        08.01.2009");
@@ -3419,6 +3781,17 @@ m_m2_1:
             MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("   Дата записи журнала ");
+           MmiGotoxy(0,3);    MmiPuts("      День.Мес.Год");
+        // MmiGotoxy(0,4);    MmiPuts("        08.01.2009");
+            MmiGotoxy(0,8);    MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);    MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);    MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\--
+
       sprintf(fst_str,"%02d.%02d.%04d",(int)adate00.day,(int)adate00.month,(int)(adate00.year+2000) );
           fst_n=11;
           sw_fst=1;
@@ -3436,7 +3809,15 @@ m_m2_2:
           fst_n=4;
           sw_fst=1;
           MmiGotoxy(15,3);
-          SetDisplayPage(15); // ввод значения
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
+          SetDisplayPage(15); //  ввод значения
+#endif
+
+#if defined(MMI_NEW)
+          SetDisplayPage(EmptyPage); // ввод значения
+#endif
+//25.05.2020 YN --//\\--
           break;
        }
        else if(key==DATA)
@@ -3581,6 +3962,9 @@ m_m2_32:
 m_m2_1_1:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+         
+//25.05.2020 YN --\\//--         
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("   Время записи журнала ");
            MmiGotoxy(0,1);    MmiPuts("       Час Мин.");
         // MmiGotoxy(0,2);    MmiPuts("        08.01");
@@ -3588,6 +3972,17 @@ m_m2_1_1:
             MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("   Время записи журнала ");
+           MmiGotoxy(0,3);    MmiPuts("       Час Мин.");
+        // MmiGotoxy(0,4);    MmiPuts("        08.01");
+            MmiGotoxy(0,8);    MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);    MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);    MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\--
+
       sprintf(fst_str,"%02d.%02d",(int)adate00.hour,(int)adate00.min );
           fst_n=6;
           sw_fst=1;
@@ -3650,14 +4045,23 @@ m_m2_1_1:
 m_m1:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,0);    MmiPuts(" Показания счетчика СУГ");
-
             MmiGotoxy(0,1);    MmiPuts("1  На последний расч. час");
             MmiGotoxy(0,2);    MmiPuts("2  За последние 5 суток");
-
             MmiGotoxy(0,3);    MmiPuts("3  На указанную дату");
             MmiGotoxy(0,4);    MmiPuts("4  На текущий момент");
             MmiGotoxy(0,5);    MmiPuts("5  Значение расчетного часа");
+#else
+            MmiGotoxy(0,0);    MmiPuts(" Показания счетчика СУГ");
+            MmiGotoxy(0,2);    MmiPuts("1  На последний расч. час");
+            MmiGotoxy(0,3);    MmiPuts("2  За последние 5 суток");
+            MmiGotoxy(0,4);    MmiPuts("3  На указанную дату");
+            MmiGotoxy(0,5);    MmiPuts("4  На текущий момент");
+            MmiGotoxy(0,6);    MmiPuts("5  Значение расчетного часа");
+#endif
+//25.05.2020 YN --//\\--
        //    MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
                         f_d_ESC();
 
@@ -3707,11 +4111,21 @@ m_m3_4:
          SetDisplayPage(EmptyPage);  // чистый экран
          f_clr_scr_MMI();
             MmiGotoxy(0,0);    MmiPuts(" Меню 5.4.Другие функции. ");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,1);    MmiPuts("1  Показания расходомера");
             MmiGotoxy(0,2);    MmiPuts("2  Параметры расходомера");
             MmiGotoxy(0,3);    MmiPuts("3  Ошибки расходомера");
             MmiGotoxy(0,4);    MmiPuts("4  Поиск ICP/RTU модулей");
             MmiGotoxy(0,5);    MmiPuts("5  Список найденных модулей");
+#else
+            MmiGotoxy(0,2);    MmiPuts("1  Показания расходомера");
+            MmiGotoxy(0,3);    MmiPuts("2  Параметры расходомера");
+            MmiGotoxy(0,4);    MmiPuts("3  Ошибки расходомера");
+            MmiGotoxy(0,5);    MmiPuts("4  Поиск ICP/RTU модулей");
+            MmiGotoxy(0,6);    MmiPuts("5  Список найденных модулей");
+#endif
+//25.05.2020 YN --//\\--
 //            MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
                         f_d_ESC();
 
@@ -3725,23 +4139,31 @@ m_m3_5:
          adate11=adate00;
          SetDisplayPage(EmptyPage);  // чистый экран
          f_clr_scr_MMI();
+//25.05.2020 YN --\\//--         
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("      Текущая дата ");
            MmiGotoxy(0,1);    MmiPuts("      День.Мес.Год");
         // MmiGotoxy(0,2);    MmiPuts("        08.01.2009");
            MmiGotoxy(0,3);
 if(FlagWinSum==0)             MmiPuts("Переход лет/зим.время выключен");
 else                          MmiPuts("Переход лет/зим.время включен");
-
-/*
- if(ReadNVRAM(nr_win_sum))
- // 1 - летнее
-                              MmiPuts("      Летнее время");
-     else                     MmiPuts("      Зимнее время");
-*/
             MmiGotoxy(0,4);   MmiPuts(" 0...9,'.' - изменить");
             MmiGotoxy(0,5);   MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);   MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("      Текущая дата ");
+           MmiGotoxy(0,3);    MmiPuts("      День.Мес.Год");
+        // MmiGotoxy(0,2);    MmiPuts("        08.01.2009");
+           MmiGotoxy(0,6);
+if(FlagWinSum==0)             MmiPuts("Переход лет/зим.время выключен");
+else                          MmiPuts("Переход лет/зим.время включен");
+            MmiGotoxy(0,8);   MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);   MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);   MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\-- 
       sprintf(fst_str,"%02d.%02d.%04d",(int)adate00.day,(int)adate00.month,(int)(adate00.year+2000) );
           fst_n=11;
           sw_fst=1;
@@ -3808,7 +4230,13 @@ m_m3_4_2v:
        {
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
          MmiGotoxy(0,6);    MmiPuts("ESC,ENTER  Возврат");
+#else
+        MmiGotoxy(0,15);    MmiPuts("ESC,ENTER  Возврат");
+#endif
+//25.05.2020 YN --//\\--
          sw_mvd_m1=0;
          ff_serv=f_MVD_M3;
          sw_mmi=180;
@@ -3837,7 +4265,17 @@ m20_4:
           fst_n=3;
           sw_fst=1;
           MmiGotoxy(13,3);
-          SetDisplayPage(15);
+
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
+          SetDisplayPage(15); //  ввод значения
+#endif
+
+#if defined(MMI_NEW)
+          SetDisplayPage(EmptyPage); // ввод значения
+#endif
+//25.05.2020 YN --//\\--
+
           break;
        }
        else if(key== DATA )
@@ -3881,7 +4319,13 @@ m20_4:
          MmiGotoxy(0,1);  MmiPrintf("Макс.Адр %d",licp_amax);
        }
 
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
        MmiGotoxy(0,6);  MmiPuts("  Enter - продолжить");
+#else
+       MmiGotoxy(0,15);  MmiPuts("  Enter - продолжить");
+#endif
+//25.05.2020 YN --//\\--
        sw_mmi=24;
        break;
        }
@@ -3935,27 +4379,31 @@ m20_4:
 m_m3_5_1:
          SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
            MmiGotoxy(0,0);    MmiPuts("      Текущее время ");
            MmiGotoxy(0,1);    MmiPuts("       Час Мин Сек");
         // MmiGotoxy(0,2);    MmiPuts("         08.01.00");
            MmiGotoxy(0,3);
 if(FlagWinSum==0)             MmiPuts("Переход лет/зим.время выключен");
 else                          MmiPuts("Переход лет/зим.время включен");
-/*
- if(ReadNVRAM(nr_win_sum))
- // 1 - летнее
-                              MmiPuts("      Летнее время");
-     else                     MmiPuts("      Зимнее время");
-*/
-
-
-
-
-
             MmiGotoxy(0,4);    MmiPuts(" 0...9,'.' - изменить");
             MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
             MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
             MmiGotoxy(8,2);
+#else
+           MmiGotoxy(0,1);    MmiPuts("      Текущее время ");
+           MmiGotoxy(0,3);    MmiPuts("       Час Мин Сек");
+        // MmiGotoxy(0,2);    MmiPuts("         08.01.00");
+           MmiGotoxy(0,6);
+if(FlagWinSum==0)             MmiPuts("Переход лет/зим.время выключен");
+else                          MmiPuts("Переход лет/зим.время включен");
+            MmiGotoxy(0,8);    MmiPuts(" 0...9,'.' - изменить");
+            MmiGotoxy(0,9);    MmiPuts(" Enter - ввод");
+            MmiGotoxy(0,10);    MmiPuts(" ESC   - отменить");
+            MmiGotoxy(8,4);
+#endif
+//25.05.2020 YN --//\\--
       sprintf(fst_str,"%02d.%02d.%02d",(int)adate00.hour,(int)adate00.min,(int)adate00.sec);
           fst_n=9;
           sw_fst=1;
@@ -4353,12 +4801,12 @@ m_m5_1:
          MmiGotoxy(0,0);       MmiPuts("   Отпуск дозы СУГ");
          f_prn_MassSt_dlv();
 
-         MmiGotoxy(0,2);       MmiPuts(" Введите дозу отпуска,кг");
+         MmiGotoxy(0,4);       MmiPuts(" Введите дозу отпуска,кг");
       // sprintf( fst_str,"");
          strcpy( fst_str,"");
          fst_n=5;
          sw_fst=1;
-         MmiGotoxy(10,4);
+         MmiGotoxy(10,6);
          break;
        }
        else if(key==DATA)
@@ -4411,7 +4859,13 @@ m_m5_2:
      }
      else  MmiPuts(str_verify);
 
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
       MmiGotoxy(0,6);   MmiPuts("ESC - завершить.");
+#else
+      MmiGotoxy(0,15);   MmiPuts("ESC - завершить.");
+#endif
+//25.05.2020 YN --//\\--
 
       sw_dlv_liq=1;
       sw_mmi=193;
@@ -4429,7 +4883,8 @@ m_m5_1d:
              MassT=0.;
              VolT =0.;
           }
-
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
           if(Flag_check == 0)
           {
             MmiGotoxy(0,2);MmiPrintf("М=%6.1fкг Отпущено О=%6.1fл",MassT,VolT );
@@ -4442,6 +4897,21 @@ m_m5_1d:
             MmiGotoxy(0,3);
             MmiPrintf("М=%10.3f кг|О=%10.3f л ",MassT,VolT );
           }
+#else
+          if(Flag_check == 0)
+          {
+            MmiGotoxy(0,3);MmiPrintf("М=%6.1fкг Отпущено О=%6.1fл",MassT,VolT );
+          }
+          else
+          {
+            MmiGotoxy(0,3);
+            MmiPuts("           Отпущено          ");
+
+            MmiGotoxy(0,4);
+            MmiPrintf("М=%10.3f кг|О=%10.3f л ",MassT,VolT );
+          }
+#endif
+//25.05.2020 YN --//\\--
           f_prn_proc();
           break;
 //===========================================
@@ -4489,12 +4959,12 @@ m_m6_1:
          MmiGotoxy(0,0);       MmiPuts("   Прием  дозы СУГ");
          f_prn_MassSt_rcv();
 
-         MmiGotoxy(0,2);       MmiPuts(" Введите дозу приема ,кг");
+         MmiGotoxy(0,4);       MmiPuts(" Введите дозу приема ,кг");
       // sprintf( fst_str,"");
          strcpy( fst_str," ");
          fst_n=5;
          sw_fst=1;
-         MmiGotoxy(10,4);
+         MmiGotoxy(10,6);
          break;
        }
        else if(key==DATA)
@@ -4547,8 +5017,13 @@ m_m6_2:
      }
      else  MmiPuts(str_verify);
 
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
          MmiGotoxy(0,6);   MmiPuts("ESC - завершить.");
-
+#else
+         MmiGotoxy(0,15);   MmiPuts("ESC - завершить.");
+#endif
+//25.05.2020 YN --//\\--
          sw_dlv_liq=1;
          sw_mmi=203;
 
@@ -4569,14 +5044,14 @@ m_m6_1d:
 
           if(Flag_check == 0)
           {
-            MmiGotoxy(0,2);MmiPrintf("М=%6.1fкг  Принято О=%6.1fл",MassT,VolT );
+            MmiGotoxy(0,3);MmiPrintf("М=%6.1fкг  Принято О=%6.1fл",MassT,VolT );
           }
           else
           {
-              MmiGotoxy(0,2);
+              MmiGotoxy(0,3);
               MmiPuts("           Принято           ");
 
-              MmiGotoxy(0,3);
+              MmiGotoxy(0,4);
               MmiPrintf("М=%10.3f кг|О=%10.3f л ",MassT,VolT );
           }
 
@@ -4714,8 +5189,15 @@ m_m6_1d:
         break;
        }
 */
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
          MmiGotoxy(0,2);  MmiPrintf("Ж:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[0].FlowM,s_MVD[0].Dens,s_MVD[0].Temp);
          MmiGotoxy(0,3);  MmiPrintf("П:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[1].FlowM,s_MVD[1].Dens,s_MVD[1].Temp);
+#else
+         MmiGotoxy(0,3);  MmiPrintf("Ж:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[0].FlowM,s_MVD[0].Dens,s_MVD[0].Temp);
+         MmiGotoxy(0,5);  MmiPrintf("П:%5.0fкг/ч|%5.1fкг/м3|%5.1f C",s_MVD[1].FlowM,s_MVD[1].Dens,s_MVD[1].Temp);
+#endif
+//25.05.2020 YN --//\\--
          f_prn_proc();
 //       f_dsp_ncnt();
        break;
@@ -4749,7 +5231,13 @@ m_m6_1d:
                       SetDisplayPage(EmptyPage);
                       f_clr_scr_MMI();
                       MmiGotoxy(0,0); MmiPuts("Прием/Отпуск СУГ без учета");
+                      //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
                       MmiGotoxy(0,6); MmiPuts(kran_ch);
+#else
+                      MmiGotoxy(0,15); MmiPuts(kran_ch);
+#endif
+                      //25.05.2020 YN --//\\--
                       sw_mmi=Ret_cod;
                       break;
            default:  goto m_main;
@@ -4827,6 +5315,3 @@ void f_after_MMI()
     analog_scale[1]=ftmp_naMMI[1]/NA_scale;
     analog_scale[2]=ftmp_naMMI[2]/NA_scale;
 }
-
-
-

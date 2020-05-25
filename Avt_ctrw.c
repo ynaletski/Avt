@@ -320,8 +320,15 @@ float ftmp1,ftmp2;
 
 //    MmiGotoxy(0,5);   MmiPuts("Отпуск невозможен.ESC - меню");
 //    MmiGotoxy(0,6);   MmiPuts("Sht-ESC очистка ошибок");
-      MmiGotoxy(0,5);   MmiPuts(list_avt[0]);
-      MmiGotoxy(0,6);   MmiPuts(list_avt[1]);
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
+           MmiGotoxy(0,5);   MmiPuts(list_avt[0]);
+           MmiGotoxy(0,6);   MmiPuts(list_avt[1]);
+#else
+           MmiGotoxy(0,14);   MmiPuts(list_avt[0]);
+           MmiGotoxy(0,15);   MmiPuts(list_avt[1]);
+#endif
+//25.05.2020 YN --//\\--
 
       Out_off(OUT1 | OUT2 | OUT3 | OUT4);
       sw_dlv_liq=-1;
@@ -827,8 +834,13 @@ mfc11:
 
 //    MmiGotoxy(0,2);      MmiPuts("                              ");
       MmiGotoxy(0,2);      MmiPuts(list_avt[12]);
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
       MmiGotoxy(0,6);  MmiPuts(list_avt[26]);
-
+#else
+      MmiGotoxy(0,15);  MmiPuts(list_avt[26]);
+#endif
+//25.05.2020 YN --//\\--
       sw_dlv_liq=12;
 
    break;
@@ -991,7 +1003,13 @@ m_esc:
           MmiGotoxy(0,0);   MmiPuts(list_avt[30]);  //" Отпуск остановлен            ",//30
          }
           MmiGotoxy(0,1);   MmiPuts(list_avt[31]);  //" Нажата кнопка   ESC          ",//31
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
           MmiGotoxy(0,6);   MmiPuts(list_avt[27]);  //" ESC - меню , 4 - продолжить  ",//27
+#else
+          MmiGotoxy(0,15);   MmiPuts(list_avt[27]);  //" ESC - меню , 4 - продолжить  ",//27
+#endif
+//25.05.2020 YN --//\\--
           break;
        }
        else if(key__1== STOP_E)
@@ -1002,7 +1020,13 @@ m_esc:
         {
          MmiGotoxy(0,0);   MmiPuts(list_avt[30]);  //" Прием остановлен            ",//30
         }
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
         MmiGotoxy(0,6);   MmiPuts(list_avt[28]);  //" ESC - меню                   ",//28
+#else
+        MmiGotoxy(0,15);   MmiPuts(list_avt[28]);  //" ESC - меню                   ",//28
+#endif
+//25.05.2020 YN --//\\--
         break;
        }
        else if (FL_err)
@@ -1010,7 +1034,13 @@ m_esc:
          f_clr_scr_MMI();
          f_disp_error();
 //       MmiGotoxy(0,6);       MmiPuts("Отпуск прерван.ESC - меню    ");
+         //25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
          MmiGotoxy(0,6);       MmiPuts(list_avt[15]);
+#else
+         MmiGotoxy(0,15);       MmiPuts(list_avt[15]);
+#endif
+//25.05.2020 YN --//\\--
          break;
        }
 
@@ -1020,7 +1050,13 @@ m_esc:
              MmiGotoxy(0,0);   MmiPuts(list_avt[30]);
          }
 //          MmiGotoxy(0,6);       MmiPuts(" ESC - меню    ");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,6);       MmiPuts(list_avt[28]);
+#else
+            MmiGotoxy(0,15);       MmiPuts(list_avt[28]);
+#endif
+//25.05.2020 YN --//\\--
        if(flag_fill_ok !=0)
           {
 //          MmiGotoxy(0,1);       MmiPuts(" Доза отпущена     ");
@@ -1050,7 +1086,13 @@ m_esc:
           {
 //          MmiGotoxy(0,1);       MmiPuts(" Расход снизился до пред.знач.");
             MmiGotoxy(0,1);       MmiPuts(list_avt[29]);
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
             MmiGotoxy(0,6);   MmiPuts(list_avt[27]);  //" ESC - меню , 4 - продолжить  ",//27
+#else
+            MmiGotoxy(0,15);   MmiPuts(list_avt[27]);  //" ESC - меню , 4 - продолжить  ",//27
+#endif
+//25.05.2020 YN --//\\--
             break;
           }
           else break;
@@ -1072,7 +1114,13 @@ m_esc:
          if((flag_flch !=0 ) || (key__1== ESC))
          {
              sw_dlv_liq=11;
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
              MmiGotoxy(0,6);       MmiPuts(list_avt[28]);
+#else
+             MmiGotoxy(0,15);       MmiPuts(list_avt[28]);
+#endif
+//25.05.2020 YN --//\\--
          }
          return 0;
        }
@@ -1115,12 +1163,19 @@ m_esc:
        else if (key==Sht_ESC)
         {  // очистка ошибок
           f_clr_scr_MMI();
-          SetDisplayPage(23);
+          SetDisplayPage(EmptyPage);
           f_cl_error();
 //        MmiGotoxy(0,2);    MmiPuts("        Ошибки очищены       ");
 //        MmiGotoxy(0,4);    MmiPuts(" ESC - продолжить            ");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
           MmiGotoxy(0,5);    MmiPuts(list_avt[22]);
           MmiGotoxy(0,6);    MmiPuts(list_avt[23]);
+#else
+           MmiGotoxy(0,14);   MmiPuts(list_avt[22]);
+           MmiGotoxy(0,15);   MmiPuts(list_avt[23]);
+#endif
+//25.05.2020 YN --//\\--
           sw_dlv_liq=-2;
           return ESC;
         }
@@ -1334,8 +1389,15 @@ m_err1:
 
 //         MmiGotoxy(0,5);   MmiPuts("Отпуск невозможен.ESC - меню");
 //         MmiGotoxy(0,6);   MmiPuts("Sht-ESC очистка ошибок");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
            MmiGotoxy(0,5);   MmiPuts(list_avt[0]);
            MmiGotoxy(0,6);   MmiPuts(list_avt[1]);
+#else
+           MmiGotoxy(0,14);   MmiPuts(list_avt[0]);
+           MmiGotoxy(0,15);   MmiPuts(list_avt[1]);
+#endif
+//25.05.2020 YN --//\\--
            return;
         }
 m2:
@@ -1682,7 +1744,13 @@ m_err:
     if( MVD_t_rslt[0]>0)
     {
      MmiGotoxy(0,1);  MmiPuts(list_avt[12]); // MmiPuts("              ");
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
      MmiGotoxy(0,6);  MmiPuts(list_avt[28]); // MmiPuts("  ESC - меню   );
+#else
+     MmiGotoxy(0,15);  MmiPuts(list_avt[28]); // MmiPuts("  ESC - меню   );
+#endif
+//25.05.2020 YN --//\\--
      sw_pov=9;
 
      // разрешение счета расходомера 1 Start totalizers

@@ -15,8 +15,16 @@
 
 #include "device.h"
 
-#include "PROC.h"
+//25.05.2020 YN --\\//--
+#if defined(MMI_ICP)
 #include "MMI.h"
+#endif
+#if defined(MMI_NEW)
+#include "mmi_new.h"
+#endif
+//25.05.2020 YN --//\\--
+
+#include "PROC.h"
 
 #include "queue.h"
 #include "icp.h"
@@ -36,4 +44,3 @@
 #include  "reg.h"
 #include  "prop_but.h"
 #include "md5.h"
-

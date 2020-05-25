@@ -420,12 +420,24 @@ if(fl_md_fst == 0)
  }
  else if(mode_out == 1)
  {
-    MmiGotoxy(3,2);
-    MmiPrintf("MD5 (%s,%ld) = ", filename,lgth_fl);
-    MmiGotoxy(6,3);
-    MDPrintMMI(0);
-    MmiGotoxy(6,4);
-    MDPrintMMI(8);
+#if defined(MMI_ICP)
+  MmiGotoxy(3,2);
+#else
+  MmiGotoxy(3,4);
+#endif
+ MmiPrintf("MD5 (%s,%ld) = ", filename,lgth_fl);
+#if defined(MMI_ICP)
+  MmiGotoxy(6,3);
+#else
+  MmiGotoxy(6,6);
+#endif
+ MDPrintMMI(0);
+#if defined(MMI_ICP)
+  MmiGotoxy(6,4);
+#else
+  MmiGotoxy(6,8);
+#endif
+ MDPrintMMI(8);
  }
 }
 

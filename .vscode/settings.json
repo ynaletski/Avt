@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "MD5C.C": "cpp",
+        "Dos_win.C": "cpp",
+        "SNS.C": "cpp",
+        "MMI.C": "cpp"
+    }
+}

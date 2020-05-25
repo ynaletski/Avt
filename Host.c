@@ -5091,7 +5091,7 @@ m_mve:
           dose_dlvr=vol_f;
           volume_f=vol_f;
 
-         SetDisplayPage(23);
+         SetDisplayPage(EmptyPage);
          f_clr_scr_MMI();
           puts(" β―γαª ¦¨¤ª®© δ §λ. ");
           MmiGotoxy(0,0);
